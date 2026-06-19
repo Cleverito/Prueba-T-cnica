@@ -24,5 +24,10 @@ RUN npm install -g serve
 
 COPY --from=build /app/build ./build
 
+# Railway asigna un puerto dinámico vía la variable de entorno $PORT.
+# Si la aplicación escucha en un puerto fijo (como 3000) en vez de
+# leer $PORT, Railway no puede enrutar el tráfico hacia el contenedor
+# y responde "Application failed to respond" aunque el contenedor esté
+# corriendo correctamente por dentro.
 EXPOSE 3000
-CMD ["serve", "-s", "build", "-l", "3000"]
+CMD sh -c "serve -s build -l ${PORT:-3000}"
