@@ -49,6 +49,41 @@ def test_votar_directo_a_partido_sin_candidato(client):
     assert voto["partido"]["id"] == partido["id"]
 
 
+def test_votar_sin_cedula_cumple_enunciado_base(client):
+    """
+    El enunciado original exige únicamente vincular candidato, partido
+    y momento del voto, sin mencionar control de identidad del votante.
+    Este test verifica que ese caso base funciona de forma completamente
+    independiente del control de unicidad (cedula), que es una mejora
+    adicional y por tanto opcional. Ver docs/decisiones_diseno.md.
+    """
+    partido, candidato = _crear_partido_y_candidato(client)
+
+    r = client.post("/votos", json={"candidato_id": candidato["id"]})
+
+    assert r.status_code == 201
+    voto = r.json()
+    assert voto["candidato"]["id"] == candidato["id"]
+    assert voto["partido"]["id"] == partido["id"]
+    assert "hora_voto" in voto
+
+
+def test_votar_sin_cedula_no_aplica_control_de_unicidad(client):
+    """
+    Si no se proporciona cedula, no hay restricción de unicidad: se
+    pueden registrar varios votos sin pasar por verificación de votante.
+    Esto es intencional: sin cedula, el sistema se comporta exactamente
+    como pide el enunciado base, sin el control adicional.
+    """
+    partido, candidato = _crear_partido_y_candidato(client)
+
+    r1 = client.post("/votos", json={"candidato_id": candidato["id"]})
+    r2 = client.post("/votos", json={"candidato_id": candidato["id"]})
+
+    assert r1.status_code == 201
+    assert r2.status_code == 201
+
+
 def test_enviar_candidato_y_partido_juntos_falla(client):
     """Validación de Pydantic (VotoCreate.validar_exclusividad)."""
     partido, candidato = _crear_partido_y_candidato(client)

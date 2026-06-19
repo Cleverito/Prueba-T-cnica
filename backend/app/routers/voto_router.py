@@ -26,17 +26,23 @@ def obtener_voto(voto_id: int, service: VotoService = Depends(get_voto_service))
 @router.post("", response_model=VotoResponse, status_code=201)
 def registrar_voto(
     datos: VotoCreate,
-    cedula: str,
+    cedula: str | None = None,
     service: VotoService = Depends(get_voto_service),
 ):
     """
-    Registra un voto. La cédula se recibe como query param porque NO
-    forma parte del cuerpo persistido del voto (recuerda: no existe
-    relación entre Voto y Votante). Se usa únicamente para validar
-    que esa cédula puede votar y marcarla como 'voto' tras el registro.
+    Registra un voto vinculando candidato (o partido) y momento del voto
+    — esto cumple el requisito base por sí solo, sin necesidad de cedula.
+
+    El parámetro 'cedula' es OPCIONAL: si se proporciona, activa el
+    control de unicidad de voto (una persona no puede votar dos veces),
+    implementado como mejora sobre el enunciado base. Ver
+    docs/decisiones_diseno.md para la justificación completa. La cédula
+    nunca se persiste junto al voto (no existe relación entre Voto y
+    Votante) — solo se usa para validar y actualizar el estado del
+    votante en la misma transacción.
     """
     return service.registrar_voto(
-        cedula=cedula,
         candidato_id=datos.candidato_id,
         partido_id=datos.partido_id,
+        cedula=cedula,
     )

@@ -69,9 +69,11 @@ La respuesta de `Candidato` incluye el objeto `Partido` completo anidado (no sol
 |---|---|---|---|---|
 | GET | `/votos` | — | 200 | — |
 | GET | `/votos/{id}` | — | 200 | 404 |
-| POST | `/votos?cedula=...` | `{ "candidato_id": int }` **o** `{ "partido_id": int }` (nunca ambos, nunca ninguno) | 201 | 404 (candidato/partido inexistente), 403 (votante no habilitado), 422 (ambos o ningún campo enviado) |
+| POST | `/votos?cedula=...` (opcional) | `{ "candidato_id": int }` **o** `{ "partido_id": int }` (nunca ambos, nunca ninguno) | 201 | 404 (candidato/partido inexistente), 403 (votante no habilitado, solo si se envió cedula), 422 (ambos o ningún campo enviado) |
 
-La `cedula` se envía como query parameter, no en el body, porque no forma parte del registro persistido del voto — solo se usa para validar y actualizar el estado del votante. Las respuestas de este endpoint nunca incluyen ningún dato relacionado a la cédula del votante.
+El parámetro `cedula` es **opcional**. Sin él, el voto se registra cumpliendo únicamente el requisito base (candidato/partido + momento), sin ningún control de unicidad. Con él, se activa la verificación de votante (mejora sobre el enunciado base, ver `decisiones_diseno.md`): la cédula debe haber sido verificada previamente vía `/votantes/verificar`, no debe haber votado ya, y no debe estar expirada.
+
+La `cedula`, cuando se envía, va como query parameter, no en el body, porque no forma parte del registro persistido del voto — solo se usa para validar y actualizar el estado del votante. Las respuestas de este endpoint nunca incluyen ningún dato relacionado a la cédula del votante.
 
 ## Votantes
 

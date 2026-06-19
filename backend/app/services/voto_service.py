@@ -74,36 +74,52 @@ class VotoService:
         return partido.id, None
 
     def registrar_voto(
-        self, cedula: str, candidato_id: int | None, partido_id: int | None
+        self,
+        candidato_id: int | None,
+        partido_id: int | None,
+        cedula: str | None = None,
     ) -> Voto:
         """
-        Registra un voto completo. Esta es la operación más sensible del
-        sistema: combina la validación del votante, la derivación del
-        partido, y la actualización del estado del votante en una ÚNICA
-        transacción atómica (un solo commit al final).
+        Registra un voto completo.
 
-        Si cualquier paso falla, se hace rollback de TODO: nunca debe
-        quedar un voto insertado sin que el votante quede marcado, ni
-        viceversa (eso permitiría votar dos veces).
+        El enunciado base solo exige vincular candidato, partido y momento
+        del voto — sin mencionar control de identidad del votante. La
+        verificación de cédula (control de unicidad / "una persona, un
+        voto") se implementó como mejora sobre ese enunciado, justificada
+        en docs/decisiones_diseno.md. Para no acoplar el caso base a esa
+        mejora, 'cedula' es OPCIONAL aquí:
+
+        - Si se proporciona: se aplica el control completo de unicidad
+          (votante debe existir, no haber votado, no estar expirado) y
+          la actualización de su estado ocurre en la MISMA transacción
+          atómica que la inserción del voto.
+        - Si no se proporciona: el voto se registra directamente, sin
+          ninguna validación de votante, cumpliendo el enunciado base
+          de forma independiente.
         """
         try:
-            # 1. Validar que el votante puede votar (lanza VotanteNoHabilitado si no)
-            votante = self.votante_service.validar_puede_votar(cedula)
+            votante = None
+            if cedula is not None:
+                # Lanza VotanteNoHabilitado si la cédula ya votó, está
+                # bloqueada, o no fue verificada previamente.
+                votante = self.votante_service.validar_puede_votar(cedula)
 
-            # 2. Derivar partido_id/candidato_id correctos (Factory Method)
+            # Derivar partido_id/candidato_id correctos (Factory Method)
             partido_id_final, candidato_id_final = self._construir_voto(
                 candidato_id, partido_id
             )
 
-            # 3. Crear el voto (usa flush, no commit: ver VotoRepository)
+            # Crear el voto (usa flush, no commit: ver VotoRepository)
             voto = self.repository.crear(
                 partido_id=partido_id_final, candidato_id=candidato_id_final
             )
 
-            # 4. Marcar el votante como que ya votó (usa flush, no commit)
-            self.votante_service.repository.marcar_como_voto(votante)
+            # Solo si hay votante de por medio, se marca en la misma
+            # transacción atómica (flush, no commit, ver VotanteRepository).
+            if votante is not None:
+                self.votante_service.repository.marcar_como_voto(votante)
 
-            # 5. Confirmar AMBAS operaciones en una sola transacción atómica
+            # Confirmar todas las operaciones en una sola transacción
             self.db.commit()
 
             # Refrescar para traer las relaciones (candidato, partido) completas

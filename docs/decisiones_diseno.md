@@ -26,6 +26,8 @@ Permitir editar o borrar un voto ya registrado comprometería la integridad de c
 
 ## 5. ¿Por qué no existe relación entre `Voto` y `Votante`?
 
+**Nota sobre el alcance**: el enunciado base de este proyecto exige únicamente vincular candidato, partido y momento del voto. El control de identidad del votante (verificación de cédula, bloqueo de doble voto) es una mejora añadida sobre ese enunciado, no un requisito explícito. Por eso, el parámetro `cedula` en `POST /votos` es opcional: si se omite, el voto se registra cumpliendo exactamente el enunciado base, sin pasar por ningún control de unicidad. Si se proporciona, se activa la mejora completa descrita a continuación.
+
 Esta es la decisión central del diseño en torno al secreto del voto. El sistema necesita verificar que una cédula no vote dos veces, pero **no** necesita (ni debe) poder rastrear qué votó una cédula específica. La solución fue desacoplar completamente ambas tablas: `Votante` solo registra si una cédula ya votó (un estado), `Voto` solo registra qué se votó (sin ninguna referencia a quién). No existe ninguna clave foránea entre ambas, y esta ausencia es intencional, no un olvido — verificada también por un test (`test_listar_votos_no_expone_cedula`).
 
 Se reconoce una limitación: la correlación temporal entre el registro del votante y la inserción del voto podría, en teoría, inferirse a partir de timestamps de logs del servidor. Resolver esto a nivel criptográfico (recibos sin coerción, *receipt-freeness*) excede el alcance de un proyecto académico, pero se documenta como limitación conocida.
