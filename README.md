@@ -14,6 +14,17 @@ Proyecto académico individual. Backend en FastAPI + PostgreSQL, frontend en Rea
 - [Tests](#tests)
 - [Documentación adicional](#documentación-adicional)
 
+## Ramas del repositorio
+
+Este proyecto existe en dos versiones, en ramas separadas, para que se pueda verificar tanto el cumplimiento literal del enunciado como las mejoras añadidas sobre él:
+
+| Rama | Qué contiene |
+|---|---|
+| [`main`](../../tree/main) | **Solución completa.** Incluye todo lo del enunciado base, más el control de identidad del votante (verificación de cédula, bloqueo de doble voto, secreto del voto) como mejora justificada. Esta es la versión desplegada en Railway. |
+| [`feature/enunciado-base`](../../tree/feature/enunciado-base) | **Solución ajustada al enunciado literal.** El registro de votos vincula únicamente candidato, partido y momento del voto, sin ningún control de identidad adicional. Útil para verificar el cumplimiento exacto de lo solicitado, sin elementos añadidos. |
+
+La diferencia entre ambas es mínima y está concentrada: en `main`, el parámetro `cedula` de `POST /votos` activa un control de unicidad de voto; en `feature/enunciado-base`, ese parámetro no existe y el endpoint se limita exactamente a lo que el enunciado pide. El resto del sistema (modelo de datos, arquitectura, principios aplicados, frontend) es idéntico en ambas ramas. El razonamiento completo de esta decisión está en [`docs/decisiones_diseno.md`](docs/decisiones_diseno.md#nota-sobre-las-dos-ramas-del-repositorio).
+
 ## Características
 
 - **CRUD completo** de partidos políticos y candidatos (las 4 operaciones HTTP: GET, POST, PUT, DELETE).

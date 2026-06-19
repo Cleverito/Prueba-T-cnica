@@ -26,6 +26,8 @@ Permitir editar o borrar un voto ya registrado comprometería la integridad de c
 
 ## 5. ¿Por qué no existe relación entre `Voto` y `Votante`?
 
+**Nota sobre el alcance**: el enunciado base de este proyecto exige únicamente vincular candidato, partido y momento del voto. El control de identidad del votante (verificación de cédula, bloqueo de doble voto) es una mejora añadida sobre ese enunciado, no un requisito explícito. Por eso, el parámetro `cedula` en `POST /votos` es opcional: si se omite, el voto se registra cumpliendo exactamente el enunciado base, sin pasar por ningún control de unicidad. Si se proporciona, se activa la mejora completa descrita a continuación.
+
 Esta es la decisión central del diseño en torno al secreto del voto. El sistema necesita verificar que una cédula no vote dos veces, pero **no** necesita (ni debe) poder rastrear qué votó una cédula específica. La solución fue desacoplar completamente ambas tablas: `Votante` solo registra si una cédula ya votó (un estado), `Voto` solo registra qué se votó (sin ninguna referencia a quién). No existe ninguna clave foránea entre ambas, y esta ausencia es intencional, no un olvido — verificada también por un test (`test_listar_votos_no_expone_cedula`).
 
 Se reconoce una limitación: la correlación temporal entre el registro del votante y la inserción del voto podría, en teoría, inferirse a partir de timestamps de logs del servidor. Resolver esto a nivel criptográfico (recibos sin coerción, *receipt-freeness*) excede el alcance de un proyecto académico, pero se documenta como limitación conocida.
@@ -67,3 +69,16 @@ En su lugar, se aplicó un **Factory Method** puntual en `VotoService._construir
 ## 13. ¿Por qué Docker para desarrollo local y Railway para la demo?
 
 Docker garantiza que cualquiera que clone el repositorio reproduzca exactamente el mismo entorno (mismo PostgreSQL, misma configuración), sin depender de un servicio externo durante el desarrollo activo. Railway se usa en paralelo para tener una URL pública desplegada, de forma que un evaluador pueda probar el sistema sin instalar nada localmente. El mismo `Dockerfile` del backend se reutiliza para ambos entornos.
+
+## 14. Nota sobre las dos ramas del repositorio
+
+El enunciado original de este proyecto especifica, en su punto (a), que *"el modelo consta de las entidades: candidato, partido y votos"* — tres entidades, y el registro de un voto exige únicamente vincular candidato, partido y momento del voto. No se menciona control de identidad del votante en ningún punto del enunciado.
+
+Durante el desarrollo se incorporó una cuarta entidad, `Votante`, junto con un flujo de verificación de cédula que bloquea el doble voto y preserva el secreto del voto (ver puntos 5, 6 y 7 de este documento). Esta decisión se tomó porque, en cualquier sistema que modele elecciones reales, la ausencia de control de unicidad de voto deja de ser un sistema electoral y pasa a ser solo un registro sin integridad — pero se reconoce con honestidad que **esta mejora no fue solicitada explícitamente en el enunciado**.
+
+Para que el cumplimiento del enunciado literal sea verificable de forma independiente de esa mejora, el repositorio se organiza en dos ramas:
+
+- **`main`**: la solución completa, con el control de votante activo. El parámetro `cedula` en `POST /votos` es opcional — si se envía, activa el control de unicidad; si no, el endpoint se comporta exactamente como en la rama base.
+- **`feature/enunciado-base`**: una versión donde `POST /votos` no contempla ningún parámetro de cédula ni control de identidad, ciñéndose exactamente a lo que el enunciado pide: vincular candidato, partido y momento del voto.
+
+La diferencia entre ambas ramas se concentra en tres archivos (`voto_service.py`, `voto_router.py`, `test_voto.py`) y no afecta el modelo de datos, la arquitectura en capas, los principios aplicados, ni el frontend, que son idénticos en ambas. Esto permite evaluar el proyecto desde cualquiera de las dos perspectivas: el cumplimiento estricto del enunciado, o la solución con mejoras de producto justificadas sobre él.
