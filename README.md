@@ -76,9 +76,10 @@ Una vez levantado:
 
 ### Opción B: Demo desplegada en Railway
 
-Backend desplegado y accesible públicamente:
-- API y documentación interactiva (Swagger): https://prueba-t-cnica-production.up.railway.app/docs
-- Verificación de estado: https://prueba-t-cnica-production.up.railway.app/health
+Aplicación completa desplegada y accesible públicamente:
+- **Frontend (interfaz de votación)**: https://empathetic-recreation-production-e891.up.railway.app
+- **Backend — API y documentación interactiva (Swagger)**: https://prueba-t-cnica-production.up.railway.app/docs
+- **Backend — Verificación de estado**: https://prueba-t-cnica-production.up.railway.app/health
 
 ### Frontend
 
