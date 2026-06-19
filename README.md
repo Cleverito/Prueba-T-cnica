@@ -76,7 +76,9 @@ Una vez levantado:
 
 ### Opción B: Demo desplegada en Railway
 
-_(Completar con la URL pública una vez desplegado: `https://<proyecto>.up.railway.app/docs`)_
+Backend desplegado y accesible públicamente:
+- API y documentación interactiva (Swagger): https://prueba-t-cnica-production.up.railway.app/docs
+- Verificación de estado: https://prueba-t-cnica-production.up.railway.app/health
 
 ### Frontend
 
