@@ -1,0 +1,64 @@
+# ─────────────────────────────────────────
+# Variables de entorno (NUNCA subir al repo)
+# ─────────────────────────────────────────
+.env
+.env.local
+.env.railway
+
+# ─────────────────────────────────────────
+# Python
+# ─────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+.venv/
+venv/
+env/
+
+# ─────────────────────────────────────────
+# Testing
+# ─────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ─────────────────────────────────────────
+# Node / React
+# ─────────────────────────────────────────
+node_modules/
+frontend/build/
+frontend/dist/
+npm-debug.log*
+yarn-error.log*
+
+# ─────────────────────────────────────────
+# VS Code
+# ─────────────────────────────────────────
+.vscode/settings.json
+.vscode/launch.json
+# (sí subir: .vscode/extensions.json para recomendar extensiones al equipo)
+
+# ─────────────────────────────────────────
+# Docker
+# ─────────────────────────────────────────
+# Los volúmenes de datos de PostgreSQL no deben subirse
+postgres_data/
+
+# ─────────────────────────────────────────
+# Archivos del sistema operativo
+# ─────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ─────────────────────────────────────────
+# Logos subidos por usuarios (contenido dinámico)
+# El directorio static/logos/ se crea en el Dockerfile
+# ─────────────────────────────────────────
+backend/static/logos/*
+!backend/static/logos/.gitkeep

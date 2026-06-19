@@ -1,0 +1,21 @@
+# Framework web
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+
+# Base de datos
+sqlalchemy==2.0.36
+psycopg2-binary==2.9.10
+alembic==1.14.0          # Migraciones de base de datos
+
+# Validación y configuración
+pydantic==2.10.3
+pydantic-settings==2.6.1  # Para leer variables de entorno en config.py
+
+# Utilidades
+python-multipart==0.0.12  # Para subida de archivos (logos)
+python-dotenv==1.0.1
+
+# Testing
+pytest==8.3.4
+pytest-asyncio==0.24.0
+httpx==0.28.1             # Cliente HTTP para tests de la API
