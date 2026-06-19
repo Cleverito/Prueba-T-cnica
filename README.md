@@ -111,6 +111,22 @@ docker exec -it electoral_backend python3 -m pytest tests/ -v
 
 26 tests cubren reglas de negocio (unicidad compuesta, derivación de partido, bloqueo de doble voto) y garantías estructurales de diseño (ej. que el router de votos no registre `PUT`/`DELETE`).
 
+## Evidencia de funcionamiento
+
+Capturas de la aplicación corriendo en producción (Railway).
+
+**API REST — documentación interactiva (Swagger)**
+
+![Swagger mostrando los endpoints de Partidos y Candidatos](docs/imagenes/evidencia_swagger.png)
+
+**Frontend — flujo de votación (verificación de cédula)**
+
+![Pantalla de verificación de identidad antes de votar](docs/imagenes/evidencia_votar.png)
+
+**Frontend — resultados agregados**
+
+![Resultados con votos escrutados por partido y candidato](docs/imagenes/evidencia_resultados.png)
+
 ## Documentación adicional
 
 - [`docs/modelo_datos.md`](docs/modelo_datos.md) — las 4 tablas, sus columnas, constraints y relaciones.

@@ -4,35 +4,9 @@ El sistema usa PostgreSQL (relacional) en lugar de una base NoSQL porque el domi
 
 ## Diagrama entidad-relación
 
-```
-┌─────────────────┐
-│   Partido         │
-│ - id (PK)         │
-│ - nombre           │
-│ - logo_url         │
-└────────┬─────────┘
-         │ 1
-         │
-         │ N
-┌────────▼─────────┐
-│   Candidato        │
-│ - id (PK)          │
-│ - nombre            │
-│ - numero            │
-│ - partido_id (FK)   │
-└────────┬─────────┘
-         │ (referenciado opcionalmente)
-         │
-┌────────▼─────────┐         ┌──────────────────┐
-│   Voto              │         │   Votante           │
-│ - id (PK)           │   ✗    │ - cedula (PK)      │
-│ - candidato_id (FK?)│ (SIN   │ - estado            │
-│ - partido_id (FK)   │  FK)   │ - hora_registro     │
-│ - hora_voto          │        │                     │
-└───────────────────┘         └──────────────────┘
-```
+![Diagrama entidad-relación del sistema electoral](imagenes/modelo_datos.png)
 
-**Nota importante**: no existe ninguna relación entre `Voto` y `Votante`. Esta ausencia es intencional — ver [`decisiones_diseno.md`](decisiones_diseno.md) para el razonamiento completo sobre el secreto del voto.
+**Nota importante**: no existe ninguna relación entre `Voto` y `Votante` (marcado explícitamente con la X roja en el diagrama). Esta ausencia es intencional — ver [`decisiones_diseno.md`](decisiones_diseno.md) para el razonamiento completo sobre el secreto del voto.
 
 ## Tabla `partidos`
 
